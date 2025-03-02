@@ -38,7 +38,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
         int row = 0; // Only checks the columns 
 
         for(int col= 0; col<6; col++){
-            if(state[col][row] == -1){
+            if(state[row][col] == -1){
                 moves.add(col);
             }
         }
