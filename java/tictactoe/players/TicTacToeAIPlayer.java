@@ -113,22 +113,97 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
 	}
 	
 	public int getMove(){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//run and return alpha beta search
+        return alphaBetaSearch(this.model.getGrid());
 	}
 	
 	public int alphaBetaSearch(char[][] state){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+		//begin recursive search with the max value function, alpha and beta each set to negative and positive infinity
+        int utilityAction[] = maxValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+        //return action after recursion ends
+        return utilityAction[1];
 	}
 	
-	public int maxValue(char[][] state, int alpha, int beta){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+	public int[] maxValue(char[][] state, int alpha, int beta){
+		//create utility-action pair for storing results
+        int utilityAction[] = new int [2];
+
+        //check if game is over
+        if (terminalTest(state)) {
+            //return utility of game state, null action
+            utilityAction[0] = utility(state);
+
+            return utilityAction;
+        }
+
+        //initialize best utility to -inf (worst possible for max)
+        utilityAction[0] = Integer.MIN_VALUE;
+
+        //loop through all possible actions from current state
+        for (int action : actions(state)) {
+            //simulate the action to determine the resulting state recursively using min value function
+            int minimumUtilityAction[] = minValue(result(state, action), alpha, beta);
+
+            //check if best utility is less than minimum utility value
+            if (minimumUtilityAction[0] > utilityAction[0]) {
+                //update best value
+                utilityAction[0] = minimumUtilityAction[0];
+                //store move
+                utilityAction[1] = action;
+            }
+
+            //update the alpha value if best utility is better than alpha
+            alpha = Math.max(alpha, utilityAction[0]);
+
+            //prune the search if the current best utility is worse than beta
+            if (utilityAction[0] >= beta) {
+                return utilityAction;
+            }
+        }
+        
+        //return the best utility and action found
+        return utilityAction;
 	}
 	
-	public int minValue(char[][] state, int alpha, int beta){
-		/* REPLACE WITH YOUR CODE */
-		return -1;
+	public int[] minValue(char[][] state, int alpha, int beta){
+		//create utility-move pair for storing results
+        int utilityAction[] = new int [2];
+
+        //check if game is over
+        if (terminalTest(state)) {
+            //return utility of game state, null action
+            utilityAction[0] = utility(state);
+
+            return utilityAction;
+        }
+
+        //initialize best utility to +inf (worst possible for min)
+        utilityAction[0] = Integer.MAX_VALUE;
+
+        //loop through all possible actions from current state
+        for (int action : actions(state)) {
+            //simulate the action to determine the resulting state recursively using max value function
+            int maximumUtilityAction[] = maxValue(result(state, action), alpha, beta);
+
+            //check if best utility is greater than maximum utility value
+            if (maximumUtilityAction[0] < utilityAction[0]) {
+                //update best value
+                utilityAction[0] = maximumUtilityAction[0];
+                //store move
+                utilityAction[1] = action;
+            }
+
+            //update the beta value if best utility is better than beta
+            beta = Math.min(beta, utilityAction[0]);
+
+            //prune the search if the current best utility is worse than alpha
+            if (utilityAction[0] <= alpha) {
+                return utilityAction;
+            }
+        }
+
+        //return best utility and action found
+        return utilityAction;
 	}
 }

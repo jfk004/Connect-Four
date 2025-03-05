@@ -7,8 +7,8 @@ public class ConnectFour {
 
 	public static void main(String[] args) {
 		// Choose one
-		//playSingleGame();
-		playBatchGames(500);
+		playSingleGame();
+		//playBatchGames(500);
 				
 	}
 	
@@ -17,7 +17,7 @@ public class ConnectFour {
 		
 		// Change the constructor calls to change the players used
 		ConnectFourPlayer player1 = new ConnectFourHumanPlayer(m);
-		ConnectFourPlayer player2 = new ConnectFourRandomPlayer(m);
+		ConnectFourPlayer player2 = new ConnectFourAIPlayer(m);
 		
 		// Choose 1 of the Controller/View set-ups below.
 		
