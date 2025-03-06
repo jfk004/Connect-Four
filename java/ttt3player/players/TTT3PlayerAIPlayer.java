@@ -1,5 +1,7 @@
 package ttt3player.players;
 
+// Jessica Theodore CSC350 Question 8
+
 import java.util.ArrayList;
 
 import ttt3player.mvc.TTT3PlayerModel;
@@ -168,8 +170,81 @@ public class TTT3PlayerAIPlayer extends TTT3PlayerAbstractPlayer {
 			return '+';
 	}
 	
-	public int getMove(){
-		/* REPLACE WITH YOUR CODE -- Should return a number between 1 and 16 */
-		return -1;
+	public int getMove() {
+		// Start the minimax search with depth 0
+		return minimax(model.getGrid(), 0, Integer.MIN_VALUE, Integer.MAX_VALUE).move;
 	}
+	
+	private MinimaxResult minimax(char[][] state, int depth, int alpha, int beta) {
+		// If the game is over or we've reached the maximum depth, return the utility of the state
+		if (terminalTest(state) || depth == 5) {
+			int[] util = utility(state);
+			return new MinimaxResult(util[playerNumber], -1);  // Return -1 for terminal states
+		}
+	
+		// Get all possible moves
+		int[] validMoves = actions(state);
+		if (validMoves.length == 0) {
+			return new MinimaxResult(0, -1);  // No valid moves left, return -1
+		}
+	
+		// The best result we're looking for, initialized to the worst case for this player
+		int bestValue = (playerNumber == 0) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		int bestMove = -1;
+	
+		// Explore all possible moves
+		for (int move : validMoves) {
+			// Simulate the move
+			char[][] newState = result(state, move);
+	
+			// Recursively call minimax on the new state
+			MinimaxResult result = minimax(newState, depth + 1, alpha, beta);
+	
+			// Update best move for current player
+			if (playerNumber == 0) {  // Maximize for 'X'
+				if (result.utility > bestValue) {
+					bestValue = result.utility;
+					bestMove = move;
+				}
+				alpha = Math.max(alpha, bestValue);
+			} else if (playerNumber == 1) {  // Maximize for 'O'
+				if (result.utility > bestValue) {
+					bestValue = result.utility;
+					bestMove = move;
+				}
+				alpha = Math.max(alpha, bestValue);
+			} else {  // Maximize for '+'
+				if (result.utility > bestValue) {
+					bestValue = result.utility;
+					bestMove = move;
+				}
+				alpha = Math.max(alpha, bestValue);
+			}
+	
+			// If the best move has been found, no need to explore further
+			if (beta <= alpha) {
+				break;
+			}
+		}
+	
+		// If no valid move has been found, return a default (fallback) valid move
+		if (bestMove == -1) {
+			bestMove = validMoves[0];  // Default to the first valid move if no move found
+		}
+	
+		return new MinimaxResult(bestValue, bestMove);
+	}
+	
+	// Helper class to store the result of the minimax algorithm
+	private class MinimaxResult {
+		int utility;
+		int move;
+	
+		MinimaxResult(int utility, int move) {
+			this.utility = utility;
+			this.move = move;
+		}
+	}
+	
+	
 }
