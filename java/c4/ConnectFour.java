@@ -16,14 +16,9 @@ public class ConnectFour {
 		ConnectFourModel m = new ConnectFourModel();
 		
 		// Change the constructor calls to change the players used
-		ConnectFourPlayer player1 = new ConnectFourHumanPlayer(m);
-		//ConnectFourPlayer player2 = new ConnectFourAIPlayer(m);
+		ConnectFourPlayer player1 = new ConnectFourRandomPlayer(m);
+		ConnectFourPlayer player2 = new ConnectFourAIPlayer(m);
 		
-		//AI with cutoff
-		ConnectFourPlayer player2 = new ConnectFourAIPlayer(m,12);
-		
-		//player2 = new ConnectFourHumanPlayer(m);
-
 		// Choose 1 of the Controller/View set-ups below.
 		
 		// Sets up "silent" view -- No output at all

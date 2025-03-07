@@ -513,18 +513,6 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
         return utilityAction;
     }
 
-    // Helper method to check if the board is full
-    private boolean isBoardFull(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            for (int column = 0; column < board[0].length; column++) {
-                if (board[row][column] == '-') {
-                    return false; // There's an empty spot, so the board is not full
-                }
-            }
-        }
-        return true; // The board is full
-    }
-
     // Checks if the player has won or if the game has reached a draw
     public boolean terminalTest(int[][] board) {
         return this.model.checkForWinner() != ConnectFourModel.EMPTY || this.model.checkForDraw();
@@ -537,7 +525,7 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
         int row = 0; // Only checks the columns
 
         //add column to moves if it has at least one empty spot at top
-        for (int col = 0; col < 6; col++) {
+        for (int col = 0; col < state[0].length; col++) {
             if (state[row][col] == ConnectFourModel.EMPTY) {
                 moves.add(col);
             }
