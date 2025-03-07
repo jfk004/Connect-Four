@@ -69,11 +69,11 @@ public class ConnectFourModel implements ConnectFourModelInterface{
 	
 	public int checkForWinner(){
 		int winResult = checkHorizontalWin();
-		if(winResult < 0)
+		if (winResult < 0)
 			winResult = checkVerticalWin();
-		if(winResult < 0)
+		if (winResult < 0)
 			winResult = checkNegDiagonalWin();
-		if(winResult < 0)
+		if (winResult < 0)
 			winResult = checkPosDiagonalWin();
 		
 		// Must not have one
