@@ -544,8 +544,8 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
     //returns resulting state from current state and action
     public int[][] results(int[][] state, int action) {
 
-        int[][] newState = new int[state.length][state[0].length];
         // deep copy of the board
+        int[][] newState = new int[state.length][state[0].length];
         for (int row = 0; row < state.length; row++) {
             for (int col = 0; col < state[0].length; col++) {
                 newState[row][col] = state[row][col];
