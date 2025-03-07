@@ -7,10 +7,18 @@ import tictactoe.mvc.TicTacToeModel;
 public class TicTacToeAIPlayer extends TicTacToePlayer {
 	TicTacToeModel model;
 	char symbol;
+	private int cutoff;
 	
 	public TicTacToeAIPlayer(TicTacToeModel model, char symbol){
 		this.model = model;
 		this.symbol = symbol;
+		this.cutoff = 9;
+	}
+
+	public TicTacToeAIPlayer(TicTacToeModel model, char symbol, int cutoff){
+		this.model = model;
+		this.symbol = symbol;
+		this.cutoff = cutoff;
 	}
 	
 	// Assume actions are numbered 1-9
@@ -69,8 +77,117 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
 			return -1000;
 		else if(isDraw(state))
 			return 0;
+
+		//checks if values are next to eachother for columns and rows
+		int score = 0;
+		for(int rowcol = 1; rowcol < 3; rowcol ++){
+			//checks vertical
+			if(state[rowcol][0] == state[rowcol][1] && state[rowcol][2] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+			if(state[rowcol][1] == state[rowcol][2] && state[rowcol][0] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+			if(state[rowcol][0] == state[rowcol][2] && state[rowcol][1] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+			//checks horizontal
+			if(state[0][rowcol] == state[1][rowcol] && state[rowcol][2] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+			if(state[1][rowcol] == state[2][rowcol] && state[rowcol][0] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+			if(state[0][rowcol] == state[2][rowcol] && state[rowcol][1] == '-'){
+				//ensures only x or o 
+				if(state[rowcol][1] == 'X'){
+					score += 100;
+				} else if (state[rowcol][1] == 'O'){
+					score -= 100;
+				}
+			} 
+		}
+
+		//checks if the diagonals are unblocked
+		if(state[0][0] == state[2][2] && state[1][1] == '-'){
+			//ensures only x or o 
+			if(state[0][0] == 'X'){
+				score += 100;
+			} else if (state[0][0] == 'O'){
+				score -= 100;
+			}
+		}
+		if(state[0][2] == state[2][0] && state[1][1] == '-'){
+			//ensures only x or o 
+			if(state[0][2] == 'X'){
+				score += 100;
+			} else if (state[0][2] == 'O'){
+				score -= 100;
+			}
+		}
+		if(state[0][0] == state[1][1] && state[2][2] == '-'){
+			//ensures only x or o 
+			if(state[1][1] == 'X'){
+				score += 100;
+			} else if (state[1][1] == 'O'){
+				score -= 100;
+			}
+		}
+		if(state[1][1] == state[2][2] && state[0][0] == '-'){
+			//ensures only x or o 
+			if(state[1][1] == 'X'){
+				score += 100;
+			} else if (state[1][1] == 'O'){
+				score -= 100;
+			}
+		}
+		if(state[0][2] == state[1][1] && state[2][0] == '-'){
+			//ensures only x or o 
+			if(state[1][1] == 'X'){
+				score += 100;
+			} else if (state[1][1] == 'O'){
+				score -= 100;
+			}
+		}
+		if(state[1][1] == state[2][0] && state[0][2] == '-'){
+			//ensures only x or o 
+			if(state[1][1] == 'X'){
+				score += 100;
+			} else if (state[1][1] == 'O'){
+				score -= 100;
+			}
+		}
+
+ 
+		//inverts score depending on who player is
+		score = this.getTurn(state) == 'X' ? score : -score;
 		
-		return 0; //should not happen
+		return score; 
 	}
 	
 	protected boolean isDraw(char[][] state){
@@ -118,19 +235,20 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
 	}
 	
 	public int alphaBetaSearch(char[][] state){
+		int depth = 0;
 		//begin recursive search with the max value function, alpha and beta each set to negative and positive infinity
-        int utilityAction[] = maxValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        int utilityAction[] = maxValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
 
         //return action after recursion ends
         return utilityAction[1];
 	}
 	
-	public int[] maxValue(char[][] state, int alpha, int beta){
+	public int[] maxValue(char[][] state, int alpha, int beta, int depth){
 		//create utility-action pair for storing results
         int utilityAction[] = new int [2];
 
-        //check if game is over
-        if (terminalTest(state)) {
+        //check if game is over and if cutoff
+        if ( terminalTest(state) || depth == cutoff) {
             //return utility of game state, null action
             utilityAction[0] = utility(state);
 
@@ -143,7 +261,7 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
         //loop through all possible actions from current state
         for (int action : actions(state)) {
             //simulate the action to determine the resulting state recursively using min value function
-            int minimumUtilityAction[] = minValue(result(state, action), alpha, beta);
+            int minimumUtilityAction[] = minValue(result(state, action), alpha, beta, depth + 1);
 
             //check if best utility is less than minimum utility value
             if (minimumUtilityAction[0] > utilityAction[0]) {
@@ -162,21 +280,22 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
             }
         }
         
+
         //return the best utility and action found
         return utilityAction;
 	}
 	
-	public int[] minValue(char[][] state, int alpha, int beta){
+	public int[] minValue(char[][] state, int alpha, int beta, int depth){
 		//create utility-move pair for storing results
         int utilityAction[] = new int [2];
 
         //check if game is over
-        if (terminalTest(state)) {
+        if (depth == cutoff || terminalTest(state)) {
             //return utility of game state, null action
             utilityAction[0] = utility(state);
 
             return utilityAction;
-        }
+        } 
 
         //initialize best utility to +inf (worst possible for min)
         utilityAction[0] = Integer.MAX_VALUE;
@@ -184,7 +303,7 @@ public class TicTacToeAIPlayer extends TicTacToePlayer {
         //loop through all possible actions from current state
         for (int action : actions(state)) {
             //simulate the action to determine the resulting state recursively using max value function
-            int maximumUtilityAction[] = maxValue(result(state, action), alpha, beta);
+            int maximumUtilityAction[] = maxValue(result(state, action), alpha, beta, depth + 1);
 
             //check if best utility is greater than maximum utility value
             if (maximumUtilityAction[0] < utilityAction[0]) {
