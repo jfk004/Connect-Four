@@ -17,7 +17,7 @@ public class ConnectFour {
 		
 		// Change the constructor calls to change the players used
 		ConnectFourPlayer player1 = new ConnectFourRandomPlayer(m);
-		ConnectFourPlayer player2 = new ConnectFourAIPlayer(m, 12);
+		ConnectFourPlayer player2 = new ConnectFourAIPlayer(m, 8);
 		
 		// Choose 1 of the Controller/View set-ups below.
 		

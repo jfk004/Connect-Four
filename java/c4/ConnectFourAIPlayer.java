@@ -34,102 +34,163 @@ public class ConnectFourAIPlayer extends ConnectFourPlayer {
     }
 
     public int utilityFunction(int[][] state, int player) {
-        // Check for terminal states (win, lose, or draw)
+        // Check for terminal
         if (this.model.checkForDraw()) {
-            return 0; // Draw
+            return 0; // draw
         } else if (this.model.checkForWinner() == player) {
-            return 2000; // Current player wins
+            return 2000; // win
         } else if (this.model.checkForWinner() != -1) {
-            return -2000; // Opponent wins
+            return -2000; // loss
         }
-        
-        // Evaluate the board state for non-terminal positions
+       
+        // utility return if not terminal
         int score = 0;
-    
-        // Evaluate horizontal, vertical, and diagonal patterns
-        score += evaluatePatterns(state, player);
-    
-        // Invert score if the current player is 'O' (minimizing player)
-        if (player == 'O') {
-            score = -score;
-        }
-    
-        return score;
-    }
-    
-    // Helper method to evaluate patterns (horizontal, vertical, diagonal)
-    private int evaluatePatterns(int[][] state, int player) {
-        int score = 0;
-    
-        // Evaluate horizontal patterns
+   
+        // Test all directions            
+        // horizontal
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col <= 3; col++) {
-                score += evaluateLine(state, row, col, 0, 1, player); // Horizontal
+                //track spot types
+                int play = 0;
+                int opp = 0;
+                int empty = 0;
+               
+                //check 4 positions of row
+                for (int traverse = 0; traverse < 4; traverse++) {
+                    int travRow = row;
+                    int travCol = col + traverse;
+                    int position = state[travCol][travRow];
+           
+                    if (position == player) {
+                        play++;
+                    } else if (position == -1) {
+                        empty++;
+                    } else {
+                        opp++;
+                    }
+                }
+
+                //adds to score if 2 or 3 in a row
+                score += measureScore(play,opp,empty);
             }
         }
-    
-        // Evaluate vertical patterns
+   
+        // vertical
         for (int col = 0; col < 7; col++) {
             for (int row = 0; row <= 2; row++) {
-                score += evaluateLine(state, row, col, 1, 0, player); // Vertical
+                //track spot types
+                int play = 0;
+                int opp = 0;
+                int empty = 0;
+               
+                //check 4 positions of column
+                for (int traverse = 0; traverse < 4; traverse++) {
+                    int travRow = row + traverse;
+                    int travCol = col;
+                    int position = state[travCol][travRow];
+           
+                    if (position == player) {
+                        play++;
+                    } else if (position == -1) {
+                        empty++;
+                    } else {
+                        opp++;
+                    }
+                }
+
+                //adds to score if 2 or 3 in a row
+                score += measureScore(play,opp,empty);
             }
         }
-    
-        // Evaluate positive diagonal patterns (top-left to bottom-right)
+   
+        // diagonal (left to right)
         for (int row = 0; row <= 2; row++) {
             for (int col = 0; col <= 3; col++) {
-                score += evaluateLine(state, row, col, 1, 1, player); // Positive diagonal
+                //track spot types
+                int play = 0;
+                int opp = 0;
+                int empty = 0;
+               
+                //check 4 positions of column
+                for (int traverse = 0; traverse < 4; traverse++) {
+                    int travRow = row + traverse;
+                    int travCol = col + traverse;
+                    int position = state[travCol][travRow];
+           
+                    if (position == player) {
+                        play++;
+                    } else if (position == -1) {
+                        empty++;
+                    } else {
+                        opp++;
+                    }
+                }
+
+                //adds to score if 2 or 3 in a row
+                score += measureScore(play,opp,empty);
             }
         }
-    
-        // Evaluate negative diagonal patterns (bottom-left to top-right)
+   
+        // diagonal (right to left))
         for (int row = 3; row < 6; row++) {
             for (int col = 0; col <= 3; col++) {
-                score += evaluateLine(state, row, col, -1, 1, player); // Negative diagonal
+                //track spot types
+                int play = 0;
+                int opp = 0;
+                int empty = 0;
+               
+                //check 4 positions of column
+                for (int traverse = 0; traverse < 4; traverse++) {
+                    int travRow = row - traverse;
+                    int travCol = col + traverse;
+                    int position = state[travCol][travRow];
+           
+                    if (position == player) {
+                        play++;
+                    } else if (position == -1) {
+                        empty++;
+                    } else {
+                        opp++;
+                    }
+                }
+
+                //adds to score if 2 or 3 in a row
+                score += measureScore(play,opp,empty);
             }
         }
-    
+   
+        //inverts if opposite player
+        score = (player == this.model.getTurn()) ? score : -score;
+
         return score;
     }
-    
-    // Helper method to evaluate a line of 4 cells
-    private int evaluateLine(int[][] state, int startRow, int startCol, int rowDelta, int colDelta, int player) {
-        int playerCount = 0; // Count of current player's tokens
-        int opponentCount = 0; // Count of opponent's tokens
-        int emptyCount = 0; // Count of empty cells
-    
-        // Evaluate the 4 cells in the line
-        for (int i = 0; i < 4; i++) {
-            int row = startRow + i * rowDelta;
-            int col = startCol + i * colDelta;
-            int cell = state[col][row];
-    
-            if (cell == player) {
-                playerCount++;
-            } else if (cell == -1) {
-                emptyCount++;
-            } else {
-                opponentCount++;
-            }
+
+
+    //for each 4 spots checked, is there an important value that should be taken into account (2 or 3 or 4 in a row)
+    private int measureScore(int player, int opponent, int empty){
+        //heuristic utility value
+        //if four in a row (just in case during iteration)
+        if(player == 4){
+            return 1000; 
+        } else if (opponent ==4){
+            return -1000;
         }
-    
-        // Assign scores based on the pattern
-        if (playerCount == 4) {
-            return 1000; // Current player has 4 in a row (win)
-        } else if (opponentCount == 4) {
-            return -1000; // Opponent has 4 in a row (loss)
-        } else if (playerCount == 3 && emptyCount == 1) {
-            return 100; // Current player has 3 in a row with an empty spot
-        } else if (opponentCount == 3 && emptyCount == 1) {
-            return -100; // Opponent has 3 in a row with an empty spot
-        } else if (playerCount == 2 && emptyCount == 2) {
-            return 50; // Current player has 2 in a row with two empty spots
-        } else if (opponentCount == 2 && emptyCount == 2) {
-            return -50; // Opponent has 2 in a row with two empty spots
+        //xxx- or xx-x or x-xx or -xxx
+        else if (player == 3 && empty == 1) {
+            return 100; 
+        } else if (opponent == 3 && empty == 1) {
+            return -100; 
+        //xx-- or x-x- or x--x or -x-x or --xx or -xx-
+        } else if (player == 2 && empty == 2) {
+            return 50; 
+        } else if (opponent == 2 && empty == 2) {
+            return -50; 
         }
-    
-        return 0; // No significant pattern
+   
+        return 0; //no wins, triples or doubles
     }
+
+
 
     //search method to start alpha beta search recursion
     public int alphaBetaSearch(int[][] state) {
