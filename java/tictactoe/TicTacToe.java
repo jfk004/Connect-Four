@@ -15,7 +15,7 @@ public class TicTacToe {
 		TicTacToeModel m = new TicTacToeModel();
 		
 		// Human is X, AI is O
-		TicTacToePlayer player1 = new TicTacToeAIPlayer(m, 'X');
+		TicTacToePlayer player1 = new TicTacToeAIPlayer(m, 'X', 1);
 		TicTacToePlayer player2 = new TicTacToeHumanPlayer(m, 'O');
 		
 		// AI is X, Human is O
